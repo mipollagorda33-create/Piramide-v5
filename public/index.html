@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Pirámide de Cefa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main-menu" class="screen active">
+        <h1>CEFA PARTY APP</h1>
+        <div class="menu-buttons">
+            <button onclick="showScreen('piramide-login')" class="btn-piramide">👁️ LA PIRÁMIDE (Multijugador)</button>
+        </div>
+    </div>
+
+    <!-- LOBBY -->
+    <div id="piramide-login" class="screen">
+        <h2>👁️ ENTRAR A LA PIRÁMIDE</h2>
+        <input type="text" id="username" placeholder="Tu Apodo">
+        <input type="text" id="roomCode" placeholder="Código de Sala">
+        <button id="btn-join" onclick="joinPiramide()" class="btn-piramide">Entrar a la Sala</button>
+        <p id="login-error" class="error-text"></p>
+        <button onclick="showScreen('main-menu')" class="btn-back">Volver</button>
+    </div>
+
+    <!-- JUEGO CENTRAL -->
+    <div id="piramide-game" class="screen">
+        <div id="reglas-activas-banner"><span id="cefa-avatar">👁️</span> La Pirámide de Cefa</div>
+        <div id="server-notification" class="hidden"></div>
+        
+        <button id="btn-pause-menu" onclick="togglePauseMenu()">🎮 MINIJUEGOS</button>
+
+        <div class="piramide-center">
+            <div id="players-list" class="players-scroll"></div>
+            
+            <!-- EL TABLERO DE LA PIRÁMIDE (SE RENDERIZA AQUÍ) -->
+            <div id="mesa-central">
+                <h3>Esperando a que el Máster reparta...</h3>
+            </div>
+        </div>
+
+        <!-- INVENTARIO FIJO -->
+        <div class="hand-container">
+            <div class="hand-header">Tu Inventario (<span id="mis-tragos">0</span> Tragos consumidos)</div>
+            <div id="my-cards" class="cards-row"></div>
+        </div>
+
+        <!-- PANEL MÁSTER -->
+        <div id="master-btn" class="hidden" onclick="toggleMasterPanel()">👑</div>
+        <div id="master-panel" class="hidden">
+            <button onclick="masterStartGame()" id="btn-master-start">Repartir Cartas</button>
+            <button onclick="masterNextCard()" id="btn-master-card" class="hidden">Destapar Carta</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE MENÚ DE MINIJUEGOS (NUEVO DISEÑO CON DESPLEGABLE) -->
+    <div id="pause-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎮 ZONA DE APUESTAS</h2>
+            
+            <label>Elige a tu víctima:</label>
+            <select id="challenge-target" class="styled-select"></select>
+
+            <button class="btn-minigame" onclick="sendChallenge('coinflip')">🪙 Coinflip (2 Tragos)</button>
+            <button class="btn-minigame" onclick="sendChallenge('rps')">✂️ Piedra, Papel, Tijera (3 Tragos)</button>
+            
+            <button class="btn-back" onclick="togglePauseMenu()" style="width:100%; margin-top:20px;">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE RETO ENTRANTE (15s) -->
+    <div id="incoming-challenge-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>⚠️ ¡TE HAN RETADO!</h2>
+            <p id="incoming-challenge-text"></p>
+            <div class="timer-bar"><div class="timer-fill" id="challenge-timer"></div></div>
+            <div style="display: flex; gap: 10px; margin-top:20px;">
+                <button class="btn-piramide" style="flex:1;" onclick="acceptChallenge()">Aceptar</button>
+                <button class="btn-danger" style="flex:1;" onclick="rejectChallenge()">Rechazar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELECCIÓN COINFLIP -->
+    <div id="coinflip-choice-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🪙 ELIGE TU LADO</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-minigame" onclick="submitCoinflip('Cara')">CARA</button>
+                <button class="btn-minigame" onclick="submitCoinflip('Cruz')">CRUZ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELECCIÓN RPS -->
+    <div id="rps-choice-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>✂️ ELIGE TU ARMA</h2>
+            <button class="btn-minigame" onclick="submitRPS('Piedra')">✊ Piedra</button>
+            <button class="btn-minigame" onclick="submitRPS('Papel')">🖐 Papel</button>
+            <button class="btn-minigame" onclick="submitRPS('Tijera')">✌️ Tijera</button>
+        </div>
+    </div>
+
+    <!-- MODAL ANIMACIÓN MONEDA -->
+    <div id="animation-modal" class="modal hidden">
+        <div class="coin-container">
+            <div class="coin-spinning">🪙</div>
+            <h3 style="margin-top:20px;">La suerte está echada...</h3>
+        </div>
+    </div>
+
+    <!-- MODAL RESULTADO -->
+    <div id="result-modal" class="modal hidden">
+        <div class="modal-content result-box">
+            <h2 id="result-title"></h2>
+            <h3 id="result-str" style="color:white; margin:10px 0;"></h3>
+            <h1 id="result-winner" style="color: gold;"></h1>
+            <p id="result-loser" style="font-size: 1.2rem; color: #ff2e2e;"></p>
+            <button class="btn-piramide" onclick="closeResultModal()" style="margin-top:15px;">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
